@@ -1,0 +1,50 @@
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { logout, login } from './redux/logged';
+
+
+export default function Home () {
+    const dispatch = useDispatch();
+    const count = useSelector((state) => state.counter.value);
+    const logged = useSelector((state) => state.logged.isLogged);
+
+    return (
+        <div>
+          <p class="flex justify-center text-3xl"> Home  </p>
+          {/* {count} */}
+          {logged}
+          {
+              logged ? <p> You are Logged in  </p> : <p> You are Not logged in  </p>
+          }
+        </div>
+    );
+}
+
+
+
+
+
+
+// class Home extends Component {
+//     constructor(props) {
+//         super(props);
+//     }
+
+//     render() {
+//         return(
+// 	    <div>
+// 	      <p class="text-xl text-red-400">
+// 		hey man you're here
+// 	      </p>
+// 	    </div>
+//         );
+//     }
+// }
+
+// const mapStateToProps = (state) => {
+//     const { count  } = state;
+//     return { count : count.value };
+// }
+
+// export default Home;

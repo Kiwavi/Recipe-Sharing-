@@ -1,0 +1,43 @@
+import './App.css';
+import React, { Component } from 'react';
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Link,
+  useRouteMatch,
+  useParams
+} from "react-router-dom";
+import Home from './Home';
+import About from './About';
+import Login from '../src/components/login/Login';
+import axios from "axios";
+import Signup from '../src/components/signup/Signup';
+import CounterShow from './CounterShow';
+import Header from './Header';
+
+axios.defaults.baseURL = "http://127.0.0.1:8000";
+// axios.defaults.xsrfCookieName = 'csrftoken';
+// axios.defaults.xsrfHeaderName = 'X-CSRFToken';
+
+axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
+axios.defaults.xsrfCookieName = "XCSRF-TOKEN";
+
+// this is a nested route and is shown by the routes being wrapped inside a div
+export default function App() {
+  return (
+    <Router>
+      <div>
+        {/* replace the following with a header component later */}
+        <Header/>
+        <Routes>
+          <Route path="/" element={<Home/>}> </Route>
+          <Route path="about" element={<About/>}> </Route>
+          <Route path="login" element={<Login/>}> </Route>
+          <Route path="signup" element={<Signup/>}> </Route>
+          <Route path="counter" element={<CounterShow/>}> </Route>
+        </Routes>
+      </div>
+    </Router>
+  );
+}

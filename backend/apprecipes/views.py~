@@ -1,0 +1,183 @@
+from django.shortcuts import render
+from .models import RecipeType
+from rest_framework import viewsets
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from .serializers import RecipeSerializer
+from django.http import JsonResponse
+from django.middleware.csrf import get_token
+from django_filters.rest_framework import DjangoFilterBackend
+import django_filters
+from django_filters import rest_framework as filters
+
+# created an authentication system using knox, there are also endpoints in which user can add data. Now what remains is the frontend for both the authentication and the rest of the stuff. Take a look at the 30 days react and redux stuff. done with the authentication frontend but now i need to add redux. Once user login returns success, global state islogged is turned to true, so islogged variable should be false by default. The other thing is to add the token to the cookie so that it can be sent with every request.
+
+
+# Show login or logout based on the state. At any point we need to know the current user and whether they are logged in. Once they login, add the token to the axios header and then update state to logged in and also user name, and then redirect to the home page. Once someone clicks login, send axios request then if successful, do some dispatches. So the logout is a function that does some dispatches. Done with the post stuff to the API. Now the remaining stuff is to enable people to search for recipes on the homepage. Also add a link to show people their entries. Also enable functionality to have login only accessible pages. Tomorrow we enable searches for recipes. I am facing a problem with the tokens expiring resulting in errors when one tries to access pages in which they need to be authenticated. One way to solve this is to force a user logout once someone has made a request but the error returned is invalid token (will revisit this later). Next thing is the page to show the recipes that the user has posted which will have their detail pages in which they can also update. After that add a feature for someone to save a recipe so that they can easily come back to them later. 
+
+
+# Have an option to update a recipe or delete it, add search functionality, and also functionality to enable saving a recipe. Also create one function that handles a situation whereby tokens are expired or deleted.
+
+# the recipe detail page will be complicated if i add buttons to delete or update. but let me try by adding a button with a console first
+
+# Create your views here.
+
+# create a separate edit page and get the data as default values in the ckeditor fields. In short just another postrecipe page but with put and also with default values in the field so that the person can easily edit. So now I add a search feature. By adding a search button and then
+
+
+# With djoser, the only weakness is that tokens cannot expire and multiple clients cannot access but everything else is great. That means that when users try to access from a new phone then token changes, they will get an error when they try using in different device using the expired token. This can be solved by returning user to login page in such a situation. Another weakness is with the email activation feature which is requires someone to first activate before signing in anywhere. 
+
+
+# Knox is great with expiry of tokens and also multiple clients. Problem is that there are no endpoints for changing passwords and activating emails etc. It is just great for issuing tokens. For changing passwords and activating email, I can use custom methods. Activating email is just sending a code to their email while changing passwords is more complicated but can be solved. Changing passwords will require getting email, hitting endpoint which when given email it generates a random token which is then sent to the user's email. 
+
+# now i'm done with lots of features so the next thing is to use docker to containerize and also update the frontend. Then after I am done with this I can add further features such as saving recipes etc. But first deal with toasts and then frontend. What I need to do for docker is create the image, copy everything to the working directory, install all packages inside requirements.txt, perform migrations, and run the server. 
+
+
+class RecipeFilter(django_filters.FilterSet):
+    name = django_filters.CharFilter(lookup_expr='icontains')
+    theid = django_filters.NumberFilter(field_name='id') # named theid because id seems reserved in django
+        
+    class Meta:
+        model = RecipeType
+        fields = ['name','theid']
+
+
+# only allow the superuser full access to the whole model
+class RecipeView(viewsets.ModelViewSet):
+    serializer_class = RecipeSerializer
+    permission_classes = [AllowAny]
+    filter_backends = (filters.DjangoFilterBackend,)
+    filterset_class = RecipeFilter
+    
+    # anyone can search this endpoint but all recipes can only be accessed by the admin
+    def get_queryset(self):
+        if self.request.query_params:
+            if 'name' in self.request.query_params.keys():
+                if self.request.query_params['name'] != '':
+                    value = self.request.query_params['name']
+                    queryset = RecipeType.objects.filter(name__contains = value)
+                elif self.request.query_params['name'] == '':
+                    queryset = RecipeType.objects.filter(name = self.request.query_params['name'])
+                else:
+                    pass
+                return queryset
+            if 'id' in self.request.query_params.keys():
+                if self.request.query_params['id']:
+                    value = int(self.request.query_params['id'])
+                    queryset = RecipeType.objects.filter(pk = value)
+                return queryset
+        else:
+            if self.request.user.is_superuser:
+                queryset = RecipeType.objects.all()
+                return queryset
+            else:
+                queryset = None                
+                return queryset
+
+# this view returns a token that can be used by a post request from the frontend that requires a csrftoken
+def csrf(request):
+    return JsonResponse({'csrfToken': get_token(request)})
+
+class UserRecipesViewset(viewsets.ModelViewSet):
+    serializer_class = RecipeSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        queryset = RecipeType.objects.filter(user=self.request.user)
+        return queryset
+
+
+
+
+
+
+# from django.shortcuts import render
+# from .models import RecipeType
+# from rest_framework import viewsets
+# from rest_framework.permissions import AllowAny, IsAuthenticated
+# from .serializers import RecipeSerializer
+# from django.http import JsonResponse
+# from django.middleware.csrf import get_token
+# from django_filters.rest_framework import DjangoFilterBackend
+# import django_filters
+
+# # created an authentication system using knox, there are also endpoints in which user can add data. Now what remains is the frontend for both the authentication and the rest of the stuff. Take a look at the 30 days react and redux stuff. done with the authentication frontend but now i need to add redux. Once user login returns success, global state islogged is turned to true, so islogged variable should be false by default. The other thing is to add the token to the cookie so that it can be sent with every request.
+
+
+# # Show login or logout based on the state. At any point we need to know the current user and whether they are logged in. Once they login, add the token to the axios header and then update state to logged in and also user name, and then redirect to the home page. Once someone clicks login, send axios request then if successful, do some dispatches. So the logout is a function that does some dispatches. Done with the post stuff to the API. Now the remaining stuff is to enable people to search for recipes on the homepage. Also add a link to show people their entries. Also enable functionality to have login only accessible pages. Tomorrow we enable searches for recipes. I am facing a problem with the tokens expiring resulting in errors when one tries to access pages in which they need to be authenticated. One way to solve this is to force a user logout once someone has made a request but the error returned is invalid token (will revisit this later). Next thing is the page to show the recipes that the user has posted which will have their detail pages in which they can also update. After that add a feature for someone to save a recipe so that they can easily come back to them later. 
+
+
+# # Have an option to update a recipe or delete it, add search functionality, and also functionality to enable saving a recipe. Also create one function that handles a situation whereby tokens are expired or deleted.
+
+# # the recipe detail page will be complicated if i add buttons to delete or update. but let me try by adding a button with a console first
+
+# # Create your views here.
+
+# # create a separate edit page and get the data as default values in the ckeditor fields. In short just another postrecipe page but with put and also with default values in the field so that the person can easily edit. So now I add a search feature. By adding a search button and then
+
+
+# # With djoser, the only weakness is that tokens cannot expire and multiple clients cannot access but everything else is great. That means that when users try to access from a new phone then token changes, they will get an error when they try using in different device using the expired token. This can be solved by returning user to login page in such a situation. Another weakness is with the email activation feature which is requires someone to first activate before signing in anywhere. 
+
+
+# # Knox is great with expiry of tokens and also multiple clients. Problem is that there are no endpoints for changing passwords and activating emails etc. It is just great for issuing tokens. For changing passwords and activating email, I can use custom methods. Activating email is just sending a code to their email while changing passwords is more complicated but can be solved. Changing passwords will require getting email, hitting endpoint which when given email it generates a random token which is then sent to the user's email. 
+
+
+# # class IDFilter(django_filters.FilterSet):
+# #     id = django_filters.NumberFilter(field_name='id')
+
+# #     class Meta:
+# #         model = RecipeType
+# #         fields = ['id']
+
+# # for filtering requests like http://127.0.0.1:8000/api/v1/recipes/?name=SEAMOSS
+# # class RecipeFilter(django_filters.FilterSet):
+# #     name = django_filters.CharFilter(lookup_expr='icontains')
+
+# #     class Meta:
+# #         model = RecipeType
+# #         fields = ['name']
+
+# # only allow the superuser full access to the whole model
+# class RecipeView(viewsets.ModelViewSet):
+#     serializer_class = RecipeSerializer
+#     permission_classes = [AllowAny]
+#     # filterset_class = [RecipeFilter]
+#     filter_backends = [DjangoFilterBackend]
+#     filterset_fields = ['ingredients','id']
+
+#     # if you're changing the type of filter eg using icontains on name then do not add that field to filterset_fields above
+#     def get_queryset(self):
+#         if self.request.query_params:
+#             if 'name' in self.request.query_params.keys():
+#                 if self.request.query_params['name'] != '':
+#                     value = self.request.query_params['name']
+#                     queryset = RecipeType.objects.filter(name__contains = value)
+#                 elif self.request.query_params['name'] == '':
+#                     queryset = RecipeType.objects.filter(name = self.request.query_params['name'])
+#                 else:
+#                     pass
+#                 return queryset
+#             if 'id' in self.request.query_params.keys():
+#                 if self.request.query_params['id']:
+#                     value = int(self.request.query_params['id'])
+#                     queryset = RecipeType.objects.filter(pk = value)
+#                 return queryset
+#         else:
+#             if self.request.user.is_superuser:
+#                 queryset = RecipeType.objects.all()
+#             else:
+#                 queryset = None
+#             return queryset
+
+
+# # this view returns a token that can be used by a post request from the frontend that requires a csrftoken
+# def csrf(request):
+#     return JsonResponse({'csrfToken': get_token(request)})
+
+
+# class UserRecipesViewset(viewsets.ModelViewSet):
+#     serializer_class = RecipeSerializer
+#     permission_classes = [IsAuthenticated]
+
+#     def get_queryset(self):
+#         queryset = RecipeType.objects.filter(user=self.request.user)
+#         return queryset

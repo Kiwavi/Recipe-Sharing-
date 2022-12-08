@@ -1,0 +1,25 @@
+import { createSlice } from '@reduxjs/toolkit'
+import type { PayloadAction } from '@reduxjs/toolkit'
+
+const initialState = {
+    isLogged: false,
+    user: null,
+    token: null,
+}
+
+export const loggedSlice = createSlice({
+    name: 'logged',
+    initialState,
+    reducers: {
+	login: (state) => {
+	    state.isLogged = true;
+	},
+	logout: (state) => {
+	    state.isLogged = false;
+	},
+    }
+})
+
+export const { login, logout } = loggedSlice.actions
+
+export default loggedSlice.reducer

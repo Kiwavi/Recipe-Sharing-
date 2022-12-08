@@ -1,0 +1,40 @@
+FROM python:3
+ENV PYTHONUNBUFFERED 1
+WORKDIR /app/api
+COPY requirements.txt ./
+RUN pip install -r requirements.txt
+COPY . ./
+EXPOSE 8000
+
+
+
+# # Pull base image
+# FROM python:3.10-alpine
+
+# # Set environment variables
+# ENV PYTHONDONTWRITEBYTECODE 1
+# ENV PYTHONUNBUFFERED 1
+
+# RUN apk add --update nodejs
+
+# RUN apk add --update npm
+
+
+# RUN apk add tzdata
+# RUN ls /usr/share/zoneinfo
+# RUN cp /usr/share/zoneinfo/Africa/Nairobi /etc/localtime
+# RUN echo "Africa/Nairobi" >  /etc/timezone
+
+
+# RUN which node
+# RUN which npm
+
+# # Set work directory
+# WORKDIR /code
+
+# # Install dependencies
+# COPY requirements.txt /code/
+# RUN pip install -r requirements.txt
+
+# # Copy project
+# COPY . /code/

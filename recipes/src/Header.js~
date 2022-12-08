@@ -1,0 +1,41 @@
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { logout, login } from './redux/logged';
+import { Link } from "react-router-dom";
+import { tokenDel } from './components/login/setToken';
+
+export default function Header () {
+    const dispatch = useDispatch();
+    const logged = useSelector((state) => state.logged.isLogged);
+
+    return (
+        <div>
+          <ul>
+            <li>
+              <Link to="/"> Home </Link>
+            </li>
+            <li>
+              <Link to="about"> About</Link>
+            </li>
+            <li>
+	      {
+		  logged ?
+		      <button onClick={() => {dispatch(logout()); tokenDel()}} className='bg-purple-400'>
+			Logout
+		      </button>
+		  :
+		  /* <button onClick={() => dispatch(login())} className='bg-purple-400'> */
+		  /*   Login */
+		  /* </button> */
+                  <Link to="login"> Login  </Link>
+	      }
+              {/* <Link to="login"> Login </Link> */}
+            </li>
+            <li>
+              <Link to="signup"> Signup </Link>
+            </li>
+          </ul>
+        </div>
+    )
+}

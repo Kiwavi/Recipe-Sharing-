@@ -1,0 +1,12 @@
+from rest_framework import serializers
+from .models import RecipeType
+
+class RecipeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RecipeType
+        fields = (
+            'name',
+            'ingredients',
+            'instructions',
+            'user',
+        )
