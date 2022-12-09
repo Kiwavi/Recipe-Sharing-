@@ -5,9 +5,12 @@
 `docker-compose up`    
 ### Access using localhost:3000/ on your browser    
 ### Stack    
-* Frontend (REACT (including redux-toolkit),Tailwind)    
+* Frontend (REACT (including redux-toolkit, CkEditor, Tailwind)    
 * Backend (DjangoREST)    
 * Authentication (django-rest-knox)    
 ### Features    
 * CRUD (create, read, upload and delete recipes)    
 * Searching recipes    
+### Anticipated features    
+* Uploading images    
+* Saving recipes    
