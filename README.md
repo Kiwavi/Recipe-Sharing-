@@ -3,4 +3,11 @@
 ### Get it running    
 `docker-compose build`    
 `docker-compose up`    
-### Access using localhost:3000/ on your browser
+### Access using localhost:3000/ on your browser    
+### Stack    
+* Frontend (REACT (including redux-toolkit),Tailwind)    
+* Backend (DjangoREST)    
+* Authentication (django-rest-knox)    
+### Features    
+* CRUD (create, read, upload and delete recipes)    
+* Searching recipes    
