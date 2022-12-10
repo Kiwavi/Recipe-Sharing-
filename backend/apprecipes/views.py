@@ -24,31 +24,8 @@ class RecipeView(viewsets.ModelViewSet):
     permission_classes = [AllowAny]
     filter_backends = (filters.DjangoFilterBackend,)
     filterset_class = RecipeFilter
-    
-    # anyone can search this endpoint but all recipes can only be accessed by the admin
-    def get_queryset(self):
-        if self.request.query_params:
-            if 'name' in self.request.query_params.keys():
-                if self.request.query_params['name'] != '':
-                    value = self.request.query_params['name']
-                    queryset = RecipeType.objects.filter(name__contains = value)
-                elif self.request.query_params['name'] == '':
-                    queryset = RecipeType.objects.filter(name = self.request.query_params['name'])
-                else:
-                    pass
-                return queryset
-            if 'id' in self.request.query_params.keys():
-                if self.request.query_params['id']:
-                    value = int(self.request.query_params['id'])
-                    queryset = RecipeType.objects.filter(pk = value)
-                return queryset
-        else:
-            if self.request.user.is_superuser:
-                queryset = RecipeType.objects.all()
-                return queryset
-            else:
-                queryset = None                
-                return queryset
+    queryset = RecipeType.objects.all()    
+
 
 # this view returns a token that can be used by a post request from the frontend that requires a csrftoken
 def csrf(request):
